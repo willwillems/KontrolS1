@@ -4,10 +4,17 @@
 #define debug 1
 #define LEDS_SERIAL_OFF_STATE 0b01010101, 0b00000000, 0b11000000, 0b00000000, 0b11111111, 0b11111111
 
-const int latchPin = 9;
-const int latchPinIn = 8;
+// 165
+// Chip pin 2 (CP)   goes to SCK   (D13)
+// Chip pin 9 (Q7)   goes to MISO  (D12)
+// 595
+// Chip pin 11 (SH)  goes to SCK   (D13)
+// Chip pin 14 (DS)  goes to MOSI  (D11)
 
-const int channelNumber = 1;
+const int latchPinIn = 8; // 165
+const int latchPinOut = 9; // 595
+
+const int channelNumber = 1; // MIDI channel
 
 const byte ledsOffState[6] = { LEDS_SERIAL_OFF_STATE };
 byte ledsState[6] = { LEDS_SERIAL_OFF_STATE };
@@ -65,13 +72,15 @@ const byte digitStates[22] = {
 Encoder encoderLeft(15, 16);
 Encoder encoderRight(17, 18);
 
+const int faderPin = 19;
+
 void setup () {
   // setup SPI
   SPI.begin ();
   SPI.setClockDivider(SPI_CLOCK_DIV128);
   SPI.setDataMode(SPI_MODE0);
   SPI.setBitOrder(MSBFIRST);
-  pinMode(latchPin, OUTPUT);
+  pinMode(latchPinOut, OUTPUT);
   // setup handlers for USB MIDI
   usbMIDI.setHandleNoteOn(handleNoteOn);
   usbMIDI.setHandleNoteOff(handleNoteOff);
@@ -95,11 +104,20 @@ void loop () {
 }
 
 void sendLedsState () {
-  digitalWrite (latchPin, LOW);
+  // pulse 165 latch pin
+  digitalWrite (latchPinIn, LOW);    // pulse the parallel load latch
+  delay(1);
+  digitalWrite (latchPinIn, HIGH);
+
+  // set latch pin 595 to fill registers with state
+  digitalWrite (latchPinOut, LOW);
+  // send state
   for (int i = 0; i <= 5; i++) {
-    SPI.transfer(ledsState[i]);
+    int buttonState = SPI.transfer(ledsState[i]);
+    Serial.println(buttonState, BIN); // does not work yet
   }
-  digitalWrite (latchPin, HIGH);
+  // load state into outputs
+  digitalWrite (latchPinOut, HIGH);
 }
 
 void setLedState (int ledNumber, bool newState) {
@@ -139,7 +157,7 @@ void clearLedsState () {
 void readEncoders () {
   int encoderLeftPosition = (encoderLeft.read() / 4);
   if (encoderLeftPosition != 0) {
-    Serial.print("encoder left position");
+    Serial.print("encoder left position: ");
     Serial.println(encoderLeftPosition);
     // send encoder midi note
     if (encoderLeftPosition > 0) { usbMIDI.sendControlChange(0, 63, channelNumber); }
@@ -150,6 +168,7 @@ void readEncoders () {
   // read and proccess right encoder
   int encoderRightPosition = (encoderRight.read() / 4);
   if (encoderRightPosition != 0) {
+    Serial.print("encoder right position: ");
     Serial.println(encoderRightPosition);
     // send encoder midi note
     if (encoderRightPosition > 0) { usbMIDI.sendControlChange(1, 63, channelNumber); }
