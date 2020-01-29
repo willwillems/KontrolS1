@@ -71,3 +71,7 @@ There are 3 165 chips chained together.
 
 - Clock enable(`CE`) is connect to `GND` on every chip.
 - `PL` and `CP` of every chip are connected to connector pin 3 and 4.
+
+## Jog wheels
+
+The rotation of the jogs is measured by two photo-interrupters ([KTIR0611S](http://www.farnell.com/datasheets/2307823.pdf)). The "push down" of the jog is measured by a photo sensor that gets blocked when you push the platter down on it.
