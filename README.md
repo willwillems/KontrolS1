@@ -19,7 +19,21 @@ All leds are controlled by a transistor activated by the 595 chip. However not a
 // DM - DL - UL - UM - UR - DR - MM - DOT
 ```
 
+## Button off states
+The first four bits of the last packet are connected to GND trough some 330 R resistors. 
+
+```
+// BUTTON OFF STATES
+// -- BYTE [0]: 0B00000000 --
+// PLAY - CP4 - CUE - CP3 - SYNC - CP2 - SHIFT - CP1
+// -- BYTE [1]: 0B00000000 --
+// S4 - LOAD - S3 - LOOP OUT - S2 - LOOP IN - DECK C/D
+// -- BYTE [2]: 0B00001100 --
+// X - X - X - X - ENC-R BUT - ENC-L BUT - OFFSET DOWN - OFFSET UP
+```
+
 ## Pinout
+This is the pinout for the right hand section (from the back) the left hand connector is almost identical (mirrored). One notable exception is pin 2, i have no idea what pin 2 is.
 
 ![pinout](https://i.imgur.com/A7mcbnp.png)
 ```
@@ -75,3 +89,26 @@ There are 3 165 chips chained together.
 ## Jog wheels
 
 The rotation of the jogs is measured by two photo-interrupters ([KTIR0611S](http://www.farnell.com/datasheets/2307823.pdf)). The "push down" of the jog is measured by a photo sensor that gets blocked when you push the platter down on it.
+
+### Connections
+The 6 pin JST connector is connected to the circuit with the two photo-interrupters. There is also a connection to a third photo-interrupter but they did not end up mounting and integrating this third one into the final product.
+```
+1. VCC (3.3v)
+2. -
+3. GND
+4. ENC R
+5. ENC L
+6. ENC M (not connected or mounted)
+```
+The 3 color push cable coming out of the jog:
+```
+BLUE. GND
+RED. VCC (3.3V)
+WHITE. SIGNAL (analog read: 800~900 off, 1023 on)
+```
+
+## Observations
+- VCC should be 3.3v, not 5v. The 595 works with 5v and you will not fry the LED's but the 165 will not work and you might damage it.
+- You can easily run the 165 and 595 chips with hardware SPI.
+- The left and right circuit board are not identical at all though the connectors appear to be.
+- The left circuit seems to be "skipping" the first 4 SPI packages (no idea what is going on here).
