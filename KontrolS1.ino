@@ -1,9 +1,6 @@
 #include <SPI.h>
 #include <Encoder.h>
 
-#define debug 1
-#define LEDS_SERIAL_OFF_STATE 0b01010101, 0b00000000, 0b11000000, 0b00000000, 0b11111111, 0b11111111
-
 // 165
 // Chip pin 2 (CP)   goes to SCK   (D13)
 // Chip pin 9 (Q7)   goes to MISO  (D12)
@@ -11,13 +8,22 @@
 // Chip pin 11 (SH)  goes to SCK   (D13)
 // Chip pin 14 (DS)  goes to MOSI  (D11)
 
-const int latchPinIn = 8; // 165
-const int latchPinOut = 9; // 595
+#define latchPinIn 8 // 74HC165
+#define latchPinOut 9 // 74HC595
+
+#define faderPin 19
+
+#define debug 1
+#define LEDS_SERIAL_OFF_STATE 0b01010101, 0b00000000, 0b11000000, 0b00000000, 0b11111111, 0b11111111
+#define BUTTONS_SERIAL_OFF_STATE 0b00000000, 0b00000000, 0b00001100
 
 const int channelNumber = 1; // MIDI channel
 
 const byte ledsOffState[6] = { LEDS_SERIAL_OFF_STATE };
 byte ledsState[6] = { LEDS_SERIAL_OFF_STATE };
+
+const byte buttonsOffState[3] = { BUTTONS_SERIAL_OFF_STATE };
+byte buttonsState[3] = { BUTTONS_SERIAL_OFF_STATE };
 
 const byte digitStates[22] = {
   // .32
@@ -72,22 +78,24 @@ const byte digitStates[22] = {
 Encoder encoderLeft(15, 16);
 Encoder encoderRight(17, 18);
 
-const int faderPin = 19;
-
 void setup () {
   // setup SPI
   SPI.begin ();
   SPI.setClockDivider(SPI_CLOCK_DIV128);
   SPI.setDataMode(SPI_MODE0);
   SPI.setBitOrder(MSBFIRST);
+  pinMode(latchPinIn, OUTPUT);
   pinMode(latchPinOut, OUTPUT);
+
+  digitalWrite (latchPinIn, HIGH);
+  digitalWrite (latchPinOut, HIGH);
   // setup handlers for USB MIDI
   usbMIDI.setHandleNoteOn(handleNoteOn);
   usbMIDI.setHandleNoteOff(handleNoteOff);
   usbMIDI.setHandleControlChange(handleControlChange);
   // setup state
   clearLedsState();
-  for (int i = 0; i <= (6*8); i++) {
+  for (int i = 0; i < (6*8); i++) {
     // flip bit at position
     setLedState(i, 1);
     sendLedsState();
@@ -95,26 +103,70 @@ void setup () {
   }
   clearLedsState();
   sendLedsState();
+  readButtonState();
 }
 
 void loop () {
   readEncoders();
+  readButtonState();
   // read USB MIDI
   usbMIDI.read();
 }
 
-void sendLedsState () {
-  // pulse 165 latch pin
-  digitalWrite (latchPinIn, LOW);    // pulse the parallel load latch
-  delay(1);
-  digitalWrite (latchPinIn, HIGH);
+void readJogState() {
+  // read jog wheel rotation
+  // read jog wheel push button
+}
 
+void readButtonState () {
+  byte newButtonsState[3];
+  digitalWrite (latchPinIn, LOW);    // pulse the parallel load latch
+  delay(1); // prob not needed, or can be mS
+  digitalWrite (latchPinIn, HIGH);
+  // get new button state
+  for (int i = 0; i <= 2; i++) {
+    newButtonsState[i] = SPI.transfer(0b00000000);
+  }
+  
+  // compare to previous button state and send midi messages
+  for (int i = 0; i < (3 * 8); i++) {
+    const int arrayEl = i/8;
+    const int byteEl = i%8;
+    const bool offState = bitRead(ledsOffState[arrayEl], byteEl);
+    const bool oldState = bitRead(buttonsState[arrayEl], byteEl);
+    const bool newState = bitRead(newButtonsState[arrayEl], byteEl);
+    if (newState != oldState) {
+      if (newState ? !offState : offState) {
+        usbMIDI.sendNoteOn(i, 127, channelNumber);
+      } else {
+        usbMIDI.sendNoteOff(i, 127, channelNumber);
+      }
+      
+      if (debug) {
+        Serial.print(arrayEl);
+        Serial.print(byteEl);
+        Serial.print(offState);
+        Serial.print(oldState);
+        Serial.print(newState);
+        Serial.print("Button ");
+        Serial.print(i);
+        Serial.print(" now ");
+        Serial.println(newState ? !offState : offState);
+      }
+    }
+  }
+
+  for (int i = 0; i < 3; i++) {
+    buttonsState[i] = newButtonsState[i];
+  }
+}
+
+void sendLedsState () {
   // set latch pin 595 to fill registers with state
   digitalWrite (latchPinOut, LOW);
   // send state
   for (int i = 0; i <= 5; i++) {
-    int buttonState = SPI.transfer(ledsState[i]);
-    Serial.println(buttonState, BIN); // does not work yet
+    SPI.transfer(ledsState[i]);
   }
   // load state into outputs
   digitalWrite (latchPinOut, HIGH);
