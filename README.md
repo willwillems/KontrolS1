@@ -1,5 +1,7 @@
 # Kontrol S1 Project
 
+The following info is all about the S4 MK1, the MK2 has a different (non-panelized) PCB design and thus doesn't allow for reusing the original PCB's without serious modifications. 
+
 ## Led off states
 All leds are controlled by a transistor activated by the 595 chip. However not all are connected the same way, sending 6 all-off byte packages (`0b00000000`) will turn some of the LED's on, these specific bits to be set to HIGH instead of LOW in order to be turned off.
 
