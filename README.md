@@ -96,7 +96,7 @@ The rotation of the jogs is measured by two photo-interrupters ([KTIR0611S](http
 The 6 pin JST connector is connected to the circuit with the two photo-interrupters. There is also a connection to a third photo-interrupter but they did not end up mounting and integrating this third one into the final product.
 ```
 1. VCC (3.3v)
-2. -
+2. - (VCC??? works with vcc applied but might be too much?)
 3. GND
 4. ENC R
 5. ENC L
