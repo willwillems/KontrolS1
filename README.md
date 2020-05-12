@@ -66,8 +66,8 @@ This is the pinout for the right hand section (from the back) the left hand conn
 20. VCC
 
 1. GND
-2. POT
-3. VCC
+2. VCC
+3. POT
 4. GND
 ```
 
