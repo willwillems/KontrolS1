@@ -44,7 +44,7 @@ This is the pinout for the right hand section (from the back) the left hand conn
 // (13, 14, 15), (16, 17) and (18, 19) are connected together.
 
 1. Q7 (serial out 165)
-2. GND
+2. GND (DS from 165's on right unit)
 3. PL (latch pin 165)
 4. CP (clock input 165)
 5. ENC4-R (330 R)
