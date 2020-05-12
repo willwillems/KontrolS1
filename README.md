@@ -35,7 +35,9 @@ The first four bits of the last packet are connected to GND trough some 330 R re
 ```
 
 ## Pinout
-This is the pinout for the right hand section (from the back) the left hand connector is almost identical (mirrored). One notable exception is pin 2, i have no idea what pin 2 is.
+This is the pinout for the right hand section (from the back) the left hand connector is almost identical (mirrored). One notable exception is pin 2, ~~I have no idea what pin 2 is~~ pin 2 is the 165's DS on the right unit. Click [here](https://i.imgur.com/EdCKgI3.jpg) for the left section.
+
+> WARNING: Pinout changed, check below.
 
 ![pinout](https://i.imgur.com/A7mcbnp.png)
 ```
