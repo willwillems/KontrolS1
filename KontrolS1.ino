@@ -78,14 +78,21 @@ const byte digitStates[22] = {
 Encoder encoderLeft(15, 16);
 Encoder encoderRight(17, 18);
 
+Encoder encoderJog(5, 6);
+
+int faderState = 0;
+
 void setup () {
   // setup SPI
   SPI.begin ();
-  SPI.setClockDivider(SPI_CLOCK_DIV128);
-  SPI.setDataMode(SPI_MODE0);
-  SPI.setBitOrder(MSBFIRST);
+  SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
+//  SPI.setClockDivider(SPI_CLOCK_DIV128);
+//  SPI.setDataMode(SPI_MODE0);
+//  SPI.setBitOrder(MSBFIRST);
   pinMode(latchPinIn, OUTPUT);
   pinMode(latchPinOut, OUTPUT);
+
+  pinMode(faderPin, INPUT);
 
   digitalWrite (latchPinIn, HIGH);
   digitalWrite (latchPinOut, HIGH);
@@ -109,24 +116,23 @@ void setup () {
 void loop () {
   readEncoders();
   readButtonState();
+  readTempoFader();
+  
   // read USB MIDI
   usbMIDI.read();
 }
 
-void readJogState() {
-  // read jog wheel rotation
-  // read jog wheel push button
-}
-
 void readButtonState () {
   byte newButtonsState[3];
-  digitalWrite (latchPinIn, LOW);    // pulse the parallel load latch
-  delay(1); // prob not needed, or can be mS
-  digitalWrite (latchPinIn, HIGH);
+  // TODO: CHECK IF THIS SHOULD BE LOW - HIGH instead
+  digitalWrite (latchPinIn, HIGH);    // pulse the parallel load latch
+  // delay(1); // not needed, or can be mS
+  digitalWrite (latchPinIn, LOW);
   // get new button state
   for (int i = 0; i <= 2; i++) {
     newButtonsState[i] = SPI.transfer(0b00000000);
   }
+  digitalWrite (latchPinIn, HIGH);
   
   // compare to previous button state and send midi messages
   for (int i = 0; i < (3 * 8); i++) {
@@ -164,6 +170,7 @@ void readButtonState () {
 void sendLedsState () {
   // set latch pin 595 to fill registers with state
   digitalWrite (latchPinOut, LOW);
+  // delay(1); // not needed, or can be mS
   // send state
   for (int i = 0; i <= 5; i++) {
     SPI.transfer(ledsState[i]);
@@ -227,6 +234,25 @@ void readEncoders () {
     else { usbMIDI.sendControlChange(1, 65, channelNumber); }
     // reset enncoder
     encoderRight.write(0);
+  }
+  // read and proccess jog encoder
+  int encoderJogPosition = (encoderJog.read() / 4); // only does -4 and 4
+  if (encoderJogPosition != 0) {
+    Serial.print("encoder jog position: ");
+    Serial.println(encoderJogPosition);
+    // send encoder midi note
+    if (encoderJogPosition > 0) { usbMIDI.sendControlChange(2, 63, channelNumber); }
+    else { usbMIDI.sendControlChange(2, 65, channelNumber); }
+    // reset enncoder
+    encoderJog.write(0);
+  }
+}
+
+void readTempoFader () {
+  int newFaderState = (analogRead(faderPin) / 8);
+  if (newFaderState != faderState) {
+    faderState = newFaderState;
+    usbMIDI.sendControlChange(5, faderState, channelNumber);
   }
 }
 
