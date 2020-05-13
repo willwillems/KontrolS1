@@ -124,15 +124,14 @@ void loop () {
 
 void readButtonState () {
   byte newButtonsState[3];
-  // TODO: CHECK IF THIS SHOULD BE LOW - HIGH instead
-  digitalWrite (latchPinIn, HIGH);    // pulse the parallel load latch
-  // delay(1); // not needed, or can be mS
-  digitalWrite (latchPinIn, LOW);
+  digitalWrite (latchPinIn, LOW);    // pulse the parallel load latch
+  delayMicroseconds(5); // doesn't break when we remove this
+  digitalWrite (latchPinIn, HIGH);
+  // delayMicroseconds(5); // doesn't break when we remove this
   // get new button state
   for (int i = 0; i <= 2; i++) {
     newButtonsState[i] = SPI.transfer(0b00000000);
   }
-  digitalWrite (latchPinIn, HIGH);
   
   // compare to previous button state and send midi messages
   for (int i = 0; i < (3 * 8); i++) {
