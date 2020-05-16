@@ -116,3 +116,27 @@ WHITE. SIGNAL (analog read: 800~900 off, 1023 on)
 - You can easily run the 165 and 595 chips with hardware SPI.
 - The left and right circuit board are not identical at all though the connectors appear to be.
 - The left circuit seems to be "skipping" the first 4 SPI packages (no idea what is going on here).
+
+## Custom PCB
+
+Pinout:
+
+```
+1. INH (165-15)
+2. SER (165-10)
+3. QH (595-9)
+4. LATCH 165 (165-1)
+5. RCK (595-12)
+6. QH (165-9)
+7. SER (595-14)
+8. CLOCK
+9. GND
+10. VCC
+
+11. VCC
+12. GND
+13. FX_3
+14. FX_2
+15. FX_1
+16. FX_DW
+```
