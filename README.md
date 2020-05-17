@@ -117,18 +117,20 @@ WHITE. SIGNAL (analog read: 800~900 off, 1023 on)
 - The left and right circuit board are not identical at all though the connectors appear to be.
 - The left circuit seems to be "skipping" the first 4 SPI packages (no idea what is going on here).
 
-## Custom PCB
+## Custom FX PCB
 
-Pinout:
+The custom FX PCB has the same layout on both sides so only one version is required (if it has all both the L&R mounting holes). The custom FX PCB provides a 165 and 595 interface for the buttons and LED's respectively and a separate connector for the potentiometer signals.
+
+### Pinout
 
 ```
-1. INH (165-15)
-2. SER (165-10)
-3. QH (595-9)
-4. LATCH 165 (165-1)
-5. RCK (595-12)
-6. QH (165-9)
-7. SER (595-14)
+1. INH (165-15) [Clock enable]
+2. SER (165-10) [Serial data input]
+3. QH (595-9) [Serial data output]
+4. LATCH 165 (165-1) [Parallel load input]
+5. RCK (595-12) [storage register clock input]
+6. QH (165-9) [Serial out]
+7. SER (595-14)[Serial data input]
 8. CLOCK
 9. GND
 10. VCC
