@@ -1,4 +1,4 @@
-# Kontrol S1 Project
+![S1 Project](https://raw.githubusercontent.com/NickolasBoyer/KontrolS1/master/logo.svg)
 
 The following info is all about the S4 MK1, the MK2 has a different (non-panelized) PCB design and thus doesn't allow for reusing the original PCB's without serious modifications. The MK3 also has a single PCB for the mixer and deck sections.
 
