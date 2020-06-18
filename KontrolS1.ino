@@ -13,17 +13,20 @@
 
 #define faderPin 19
 
+#define FX_PINS 20, 21, 22, 23
+#define FX_PINS_CC 10, 11, 12, 13
+
 #define debug 1
-#define LEDS_SERIAL_OFF_STATE 0b01010101, 0b00000000, 0b11000000, 0b00000000, 0b11111111, 0b11111111
-#define BUTTONS_SERIAL_OFF_STATE 0b00000000, 0b00000000, 0b00001100
+#define LEDS_SERIAL_OFF_STATE 0b00000000, 0b01010101, 0b00000000, 0b11000000, 0b00000000, 0b11111111, 0b11111111
+#define BUTTONS_SERIAL_OFF_STATE 0b00000000, 0b00000000, 0b00000000, 0b00001100
 
 const int channelNumber = 1; // MIDI channel
 
-const byte ledsOffState[6] = { LEDS_SERIAL_OFF_STATE };
-byte ledsState[6] = { LEDS_SERIAL_OFF_STATE };
+const byte ledsOffState[7] = { LEDS_SERIAL_OFF_STATE };
+byte ledsState[7] = { LEDS_SERIAL_OFF_STATE };
 
-const byte buttonsOffState[3] = { BUTTONS_SERIAL_OFF_STATE };
-byte buttonsState[3] = { BUTTONS_SERIAL_OFF_STATE };
+const byte buttonsOffState[4] = { BUTTONS_SERIAL_OFF_STATE };
+byte buttonsState[4] = { BUTTONS_SERIAL_OFF_STATE };
 
 const byte digitStates[22] = {
   // .32
@@ -76,9 +79,13 @@ const byte digitStates[22] = {
 // DM - DL - UL - UM - UR - DR - MM - DOT
 
 Encoder encoderLeft(15, 16);
-Encoder encoderRight(17, 18);
+Encoder encoderRight(18, 17);
 
 Encoder encoderJog(5, 6);
+
+const int fxPins[4] = {FX_PINS};
+const int fxPinsCC[4] = {FX_PINS_CC};
+int fxPinsState[4] = {64, 64, 64, 64};
 
 int faderState = 0;
 
@@ -86,58 +93,63 @@ void setup () {
   // setup SPI
   SPI.begin ();
   SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
-//  SPI.setClockDivider(SPI_CLOCK_DIV128);
-//  SPI.setDataMode(SPI_MODE0);
-//  SPI.setBitOrder(MSBFIRST);
+  // set latch pins as outpur
   pinMode(latchPinIn, OUTPUT);
   pinMode(latchPinOut, OUTPUT);
-
+  // set fader pin as input
   pinMode(faderPin, INPUT);
-
+  // set fx pins as input
+  for(int i = 0; i < 4; i++) {
+    pinMode(fxPins[i], INPUT);
+  }
+  // set latch pins to initial state
   digitalWrite (latchPinIn, HIGH);
   digitalWrite (latchPinOut, HIGH);
   // setup handlers for USB MIDI
   usbMIDI.setHandleNoteOn(handleNoteOn);
   usbMIDI.setHandleNoteOff(handleNoteOff);
   usbMIDI.setHandleControlChange(handleControlChange);
-  // setup state
+  // setup led state and start-up animation
   clearLedsState();
-  for (int i = 0; i < (6*8); i++) {
+  
+  for (int i = 0; i < (7*8); i++) {
     // flip bit at position
     setLedState(i, 1);
     sendLedsState();
     delay(25);
   }
+  
   clearLedsState();
   sendLedsState();
-  readButtonState();
 }
 
 void loop () {
-  readEncoders();
   readButtonState();
+  readEncoders();
   readTempoFader();
+  readFXKnobs();
+  // Serial.println(analogRead(14)); // jog push
   
   // read USB MIDI
   usbMIDI.read();
 }
 
 void readButtonState () {
-  byte newButtonsState[3];
+  byte newButtonsState[4];
   digitalWrite (latchPinIn, LOW);    // pulse the parallel load latch
   delayMicroseconds(5); // doesn't break when we remove this
   digitalWrite (latchPinIn, HIGH);
   // delayMicroseconds(5); // doesn't break when we remove this
   // get new button state
-  for (int i = 0; i <= 2; i++) {
+  for (int i = 0; i < 4; i++) {
     newButtonsState[i] = SPI.transfer(0b00000000);
   }
   
   // compare to previous button state and send midi messages
-  for (int i = 0; i < (3 * 8); i++) {
+  for (int i = 0; i < (4 * 8); i++) {
     const int arrayEl = i/8;
     const int byteEl = i%8;
-    const bool offState = bitRead(ledsOffState[arrayEl], byteEl);
+    const bool offState = bitRead(buttonsOffState[arrayEl], byteEl);
     const bool oldState = bitRead(buttonsState[arrayEl], byteEl);
     const bool newState = bitRead(newButtonsState[arrayEl], byteEl);
     if (newState != oldState) {
@@ -148,20 +160,25 @@ void readButtonState () {
       }
       
       if (debug) {
-        Serial.print(arrayEl);
-        Serial.print(byteEl);
-        Serial.print(offState);
-        Serial.print(oldState);
-        Serial.print(newState);
-        Serial.print("Button ");
+        Serial.print("Button nr:");
         Serial.print(i);
-        Serial.print(" now ");
+        Serial.print(" Array: ");
+        Serial.print(arrayEl);
+        Serial.print(" byte: ");
+        Serial.print(byteEl);
+        Serial.print(" off: ");
+        Serial.print(offState);
+        Serial.print(" old: ");
+        Serial.print(oldState);
+        Serial.print(" new: ");
+        Serial.print(newState);
+        Serial.print(" now: ");
         Serial.println(newState ? !offState : offState);
       }
     }
   }
 
-  for (int i = 0; i < 3; i++) {
+  for (int i = 0; i < 4; i++) {
     buttonsState[i] = newButtonsState[i];
   }
 }
@@ -171,7 +188,7 @@ void sendLedsState () {
   digitalWrite (latchPinOut, LOW);
   // delay(1); // not needed, or can be mS
   // send state
-  for (int i = 0; i <= 5; i++) {
+  for (int i = 0; i < 7; i++) {
     SPI.transfer(ledsState[i]);
   }
   // load state into outputs
@@ -185,7 +202,9 @@ void setLedState (int ledNumber, bool newState) {
   bitWrite(ledsState[arrayEl], byteEl, (newState ? !offState : offState));
 
   if (debug) {
-    Serial.print("Arry: ");
+    Serial.print("Led nr:");
+    Serial.print(ledNumber);
+    Serial.print(" Array: ");
     Serial.print(arrayEl);
     Serial.print(" byte: ");
     Serial.print(byteEl);
@@ -197,8 +216,8 @@ void setLedState (int ledNumber, bool newState) {
 void setDigitState (int newState) {
   byte leftDigit = digitStates[(newState * 2)];
   byte rightDigit = digitStates[(newState * 2) + 1];
-  ledsState[4] = leftDigit;
-  ledsState[5] = rightDigit;
+  ledsState[5] = leftDigit;
+  ledsState[6] = rightDigit;
 
   if (debug) {
     Serial.print("Left digit: ");
@@ -209,7 +228,7 @@ void setDigitState (int newState) {
 }
 
 void clearLedsState () {
-  memcpy(ledsState, ledsOffState, 6);
+  memcpy(ledsState, ledsOffState, sizeof ledsState);
 }
 
 void readEncoders () {
@@ -248,13 +267,22 @@ void readEncoders () {
 }
 
 void readTempoFader () {
-  int newFaderState = (analogRead(faderPin) / 8);
+  int newFaderState = 127 - (analogRead(faderPin) / 8); // inverted
   if (newFaderState != faderState) {
     faderState = newFaderState;
     usbMIDI.sendControlChange(5, faderState, channelNumber);
   }
 }
 
+void readFXKnobs () {
+  for (int i = 0; i < 4; i++) {
+    int newKnobState = (analogRead(fxPins[i]) / 8);
+    if (newKnobState != fxPinsState[i]) {
+      fxPinsState[i] = newKnobState;
+      usbMIDI.sendControlChange(fxPinsCC[i], fxPinsState[i], channelNumber);
+    }
+  }
+}
 
 void handleNoteOn(byte channel, byte note, byte velocity) {
   if (channel != channelNumber) { return; } 
