@@ -109,6 +109,7 @@ The 3 color push cable coming out of the jog:
 BLUE. GND
 RED. VCC (3.3V)
 WHITE. SIGNAL (analog read: 800~900 off, 1023 on)
+-. DUMMY (unused pin on 4-pin JST connector) 
 ```
 
 ## Observations
