@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE eagle SYSTEM "eagle.dtd">
+<eagle version="9.6.1">
+<drawing>
+<settings>
+<setting alwaysvectorfont="no"/>
+<setting verticaltext="up"/>
+</settings>
+<grid distance="1" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.1" altunitdist="mm" altunit="mm"/>
+<layers>
+<layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
+<layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="yes"/>
+<layer number="17" name="Pads" color="2" fill="1" visible="yes" active="yes"/>
+<layer number="18" name="Vias" color="2" fill="1" visible="yes" active="yes"/>
+<layer number="19" name="Unrouted" color="6" fill="1" visible="yes" active="yes"/>
+<layer number="20" name="Dimension" color="24" fill="1" visible="yes" active="yes"/>
+<layer number="21" name="tPlace" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="22" name="bPlace" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="23" name="tOrigins" color="15" fill="1" visible="yes" active="yes"/>
+<layer number="24" name="bOrigins" color="15" fill="1" visible="yes" active="yes"/>
+<layer number="25" name="tNames" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="26" name="bNames" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="27" name="tValues" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="28" name="bValues" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="29" name="tStop" color="7" fill="3" visible="no" active="yes"/>
+<layer number="30" name="bStop" color="7" fill="6" visible="no" active="yes"/>
+<layer number="31" name="tCream" color="7" fill="4" visible="no" active="yes"/>
+<layer number="32" name="bCream" color="7" fill="5" visible="no" active="yes"/>
+<layer number="33" name="tFinish" color="6" fill="3" visible="no" active="yes"/>
+<layer number="34" name="bFinish" color="6" fill="6" visible="no" active="yes"/>
+<layer number="35" name="tGlue" color="7" fill="4" visible="no" active="yes"/>
+<layer number="36" name="bGlue" color="7" fill="5" visible="no" active="yes"/>
+<layer number="37" name="tTest" color="7" fill="1" visible="no" active="yes"/>
+<layer number="38" name="bTest" color="7" fill="1" visible="no" active="yes"/>
+<layer number="39" name="tKeepout" color="4" fill="11" visible="yes" active="yes"/>
+<layer number="40" name="bKeepout" color="1" fill="11" visible="yes" active="yes"/>
+<layer number="41" name="tRestrict" color="4" fill="10" visible="yes" active="yes"/>
+<layer number="42" name="bRestrict" color="1" fill="10" visible="yes" active="yes"/>
+<layer number="43" name="vRestrict" color="2" fill="10" visible="yes" active="yes"/>
+<layer number="44" name="Drills" color="7" fill="1" visible="no" active="yes"/>
+<layer number="45" name="Holes" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="46" name="Milling" color="3" fill="1" visible="no" active="yes"/>
+<layer number="47" name="Measures" color="7" fill="1" visible="no" active="yes"/>
+<layer number="48" name="Document" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="49" name="Reference" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="51" name="tDocu" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="52" name="bDocu" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="88" name="SimResults" color="9" fill="1" visible="yes" active="yes"/>
+<layer number="89" name="SimProbes" color="9" fill="1" visible="yes" active="yes"/>
+<layer number="90" name="Modules" color="5" fill="1" visible="yes" active="yes"/>
+<layer number="91" name="Nets" color="2" fill="1" visible="yes" active="yes"/>
+<layer number="92" name="Busses" color="1" fill="1" visible="yes" active="yes"/>
+<layer number="93" name="Pins" color="2" fill="1" visible="yes" active="yes"/>
+<layer number="94" name="Symbols" color="4" fill="1" visible="yes" active="yes"/>
+<layer number="95" name="Names" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="96" name="Values" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="97" name="Info" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="98" name="Guide" color="6" fill="1" visible="yes" active="yes"/>
+</layers>
+<library>
+<packages>
+<package name="POT_S4">
+<circle x="0" y="0" radius="3" width="0.127" layer="21"/>
+<wire x1="-6.25" y1="7" x2="6.25" y2="7" width="0.127" layer="21"/>
+<wire x1="6.25" y1="-9" x2="-6.25" y2="-9" width="0.127" layer="21"/>
+<pad name="MOUNT-L" x="-6.25" y="0" drill="2.5"/>
+<pad name="MOUNT-R" x="6.26" y="0" drill="2.5"/>
+<pad name="SIGNAL" x="-1.25" y="-11" drill="1.4"/>
+<pad name="VCC" x="1.25" y="-11" drill="1.4"/>
+<pad name="DUMMY" x="3.75" y="-11.05" drill="1.4"/>
+<pad name="GND" x="-3.75" y="-11" drill="1.4"/>
+<text x="0" y="4.5" size="1.016" layer="25" align="center">&gt;NAME</text>
+<text x="0" y="-6" size="1.016" layer="25" align="center">&gt;VALUE</text>
+<wire x1="-6.25" y1="7" x2="-6.25" y2="2" width="0.127" layer="21"/>
+<wire x1="-6.25" y1="-9" x2="-6.25" y2="-2" width="0.127" layer="21"/>
+<wire x1="6.25" y1="-9" x2="6.25" y2="-2" width="0.127" layer="21"/>
+<wire x1="6.25" y1="7" x2="6.25" y2="2" width="0.127" layer="21"/>
+</package>
+<package name="BUTTON_S4">
+<pad name="R2" x="2.5" y="2.4" drill="1.2"/>
+<pad name="LED+" x="2.5" y="0" drill="1.2"/>
+<pad name="L2" x="2.5" y="-2.4" drill="1.2"/>
+<pad name="L1" x="-2.5" y="-2.4" drill="1.2"/>
+<pad name="LED-" x="-2.5" y="0" drill="1.2"/>
+<pad name="R1" x="-2.5" y="2.4" drill="1.2"/>
+<hole x="0" y="-2.4" drill="0.7"/>
+<text x="0" y="4.21" size="0.8128" layer="25" align="center">&gt;NAME</text>
+<text x="0" y="-4.21" size="0.8128" layer="25" align="center">&gt;VALUE</text>
+<wire x1="1.3" y1="0" x2="-1.3" y2="0" width="0.127" layer="21"/>
+<wire x1="-0.5" y1="0.5" x2="-0.5" y2="-0.5" width="0.127" layer="21"/>
+<polygon width="0.127" layer="21">
+<vertex x="-0.1" y="0"/>
+<vertex x="0.5" y="0.6"/>
+<vertex x="0.5" y="-0.6"/>
+</polygon>
+<wire x1="-3.7" y1="3.6" x2="3.7" y2="3.6" width="0.127" layer="21"/>
+<wire x1="3.7" y1="3.6" x2="3.7" y2="-3.6" width="0.127" layer="21"/>
+<wire x1="3.7" y1="-3.6" x2="-3.7" y2="-3.6" width="0.127" layer="21"/>
+<wire x1="-3.7" y1="-3.6" x2="-3.7" y2="3.6" width="0.127" layer="21"/>
+</package>
+</packages>
+<symbols>
+<symbol name="POT">
+<wire x1="-4.318" y1="-1.524" x2="-4.318" y2="-0.508" width="0.254" layer="94"/>
+<wire x1="-4.318" y1="-0.508" x2="-4.318" y2="0.508" width="0.254" layer="94"/>
+<wire x1="-4.318" y1="0.508" x2="4.318" y2="0.508" width="0.254" layer="94"/>
+<wire x1="4.318" y1="0.508" x2="4.318" y2="-0.508" width="0.254" layer="94"/>
+<wire x1="4.318" y1="-0.508" x2="4.318" y2="-1.524" width="0.254" layer="94"/>
+<wire x1="4.318" y1="-1.524" x2="-4.318" y2="-1.524" width="0.254" layer="94"/>
+<wire x1="-5.08" y1="-2.54" x2="-5.08" y2="-0.508" width="0.1524" layer="94"/>
+<wire x1="-5.08" y1="-0.508" x2="-4.318" y2="-0.508" width="0.1524" layer="94"/>
+<wire x1="5.08" y1="-2.54" x2="5.08" y2="-0.508" width="0.1524" layer="94"/>
+<wire x1="5.08" y1="-0.508" x2="4.318" y2="-0.508" width="0.1524" layer="94"/>
+<wire x1="0" y1="-2.54" x2="-3.81" y2="1.778" width="0.1524" layer="94"/>
+<wire x1="-4.318" y1="1.27" x2="-3.81" y2="1.778" width="0.1524" layer="94"/>
+<wire x1="-3.81" y1="1.778" x2="-3.302" y2="2.286" width="0.1524" layer="94"/>
+<text x="-4.064" y="3.556" size="1.778" layer="95">&gt;NAME</text>
+<text x="-2.286" y="1.27" size="1.778" layer="96">&gt;VALUE</text>
+<pin name="1A" x="-5.08" y="-5.08" visible="pad" length="short" direction="pas" rot="R90"/>
+<pin name="1S" x="0" y="-5.08" visible="pad" length="short" direction="pas" rot="R90"/>
+<pin name="1E" x="5.08" y="-5.08" visible="pad" length="short" direction="pas" rot="R90"/>
+</symbol>
+<symbol name="LED_BUTTON">
+<pin name="ANODE" x="-7.62" y="2.54" length="middle"/>
+<pin name="BUT1" x="-7.62" y="-2.54" length="middle"/>
+<pin name="CATHODE" x="7.62" y="2.54" length="middle" rot="R180"/>
+<pin name="BUT2" x="7.62" y="-2.54" length="middle" rot="R180"/>
+<wire x1="-2.54" y1="-2.54" x2="2.54" y2="0" width="0.254" layer="94"/>
+<wire x1="-2.54" y1="3.81" x2="0" y2="2.54" width="0.254" layer="94"/>
+<wire x1="0" y1="2.54" x2="-2.54" y2="1.27" width="0.254" layer="94"/>
+<wire x1="-2.54" y1="1.27" x2="-2.54" y2="3.81" width="0.254" layer="94"/>
+<wire x1="0" y1="3.81" x2="0" y2="2.54" width="0.254" layer="94"/>
+<wire x1="0" y1="2.54" x2="0" y2="1.27" width="0.254" layer="94"/>
+<wire x1="0" y1="2.54" x2="2.54" y2="2.54" width="0.254" layer="94"/>
+<text x="-7.62" y="7.62" size="1.778" layer="95">&gt;NAME</text>
+<text x="-7.62" y="5.08" size="1.778" layer="96">&gt;VALUE</text>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="POT_S4">
+<gates>
+<gate name="G$1" symbol="POT" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="POT_S4">
+<connects>
+<connect gate="G$1" pin="1A" pad="GND"/>
+<connect gate="G$1" pin="1E" pad="VCC"/>
+<connect gate="G$1" pin="1S" pad="SIGNAL"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="BUTTON_S4">
+<gates>
+<gate name="G$1" symbol="LED_BUTTON" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="BUTTON_S4">
+<connects>
+<connect gate="G$1" pin="ANODE" pad="LED+"/>
+<connect gate="G$1" pin="BUT1" pad="L1 L2"/>
+<connect gate="G$1" pin="BUT2" pad="R1 R2"/>
+<connect gate="G$1" pin="CATHODE" pad="LED-"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
+</drawing>
+</eagle>
