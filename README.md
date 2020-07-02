@@ -112,7 +112,8 @@ WHITE. SIGNAL (analog read: 800~900 off, 1023 on)
 -. DUMMY (unused pin on 4-pin JST connector) 
 ```
 > ## Warning
-> The info about the jog pres is probably incorrect. The jog push is read by a [VNCL4000](https://cdn-shop.adafruit.com/datasheets/vcnl4000.pdf) which is an Ambient Light Sensor with an I2C Interface. The white cable is probably some sort of I2C comms pin. This was observed on an MK2 so this also might be wrong but I could not get reliable readings from the jog press and this would explain that. 
+> The jog press is not yet working so the info about it is possibly wrong. The MK1 does seem to use a IR proximity sensor but so far no reliable readings have been produced. The MK2 uses an Ambient Light Sensor with an I2C Interface called the [VNCL4000](https://cdn-shop.adafruit.com/datasheets/vcnl4000.pdf). The current MK1 problems might just be calibration issues but could also be something more serious.
+
 
 ## Observations
 - VCC should be 3.3v, not 5v. The 595 works with 5v and you will not fry the LED's but the 165 will not work and you might damage it.
