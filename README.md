@@ -146,3 +146,18 @@ The custom FX PCB has the same layout on both sides so only one version is requi
 15. FX_1
 16. FX_DW
 ```
+
+## Custom OLED PCB
+
+Contains adapter from 1.25mm JST to OLED, a step-up to 12V and some passive components the OLED driver needs.
+
+### Pinout
+
+```
+1. GND
+2. CLOCK
+3. GND
+4. MOSI
+5. SS-SCREEN
+6. VCC
+```
