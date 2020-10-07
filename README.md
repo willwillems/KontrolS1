@@ -58,7 +58,7 @@ This is the pinout for the right hand section (from the back) the left hand conn
 
 11. ST_CP (latch pin 595)
 12. SH_CP (clock input 595)
-13. GND
+13. GND (ON THE RIGHT DECK THIS IS PART OF THE 595 SERIAL FLOW!)
 14. GND
 15. GND
 16. LED V1 (5v but can just be 3.v)
