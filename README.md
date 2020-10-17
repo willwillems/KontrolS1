@@ -35,7 +35,7 @@ The first four bits of the last packet are connected to GND trough some 330 R re
 ```
 
 ## Pinout
-This is the pinout for the right hand section (from the back) the left hand connector is almost identical (mirrored). One notable exception is pin 2, ~~I have no idea what pin 2 is~~ pin 2 is the 165's DS on the right unit. Click [here](https://i.imgur.com/EdCKgI3.jpg) for the left section.
+This is the pinout for the DECK A board the DECK B connector is almost identical (but mirrored). The two exceptions are pin 2 and 13, ~~I have no idea what pin 2 is~~ pin 2 is the 165's DS on the DECK B unit. Click [here](https://i.imgur.com/EdCKgI3.jpg) for the DECK B section.
 
 > WARNING: Pinout changed, check below.
 
@@ -46,19 +46,19 @@ This is the pinout for the right hand section (from the back) the left hand conn
 // (13, 14, 15), (16, 17) and (18, 19) are connected together.
 
 1. Q7 (serial out 165)
-2. GND (DS from 165's on right unit)
+2. GND (DS from 165's on DECK B)
 3. PL (latch pin 165)
 4. CP (clock input 165)
 5. ENC4-R (330 R)
 6. ENC5-L (330 R)
 7. ENC4-R (330 R)
 8. ENC5-L (330 R)
-9. Q7S (serial out 595)
-10. DS (serial in 595)
+9. Q7S (serial out 595) (for DECK B this is the serial out of the 4 upper 595's)
+10. DS (serial in 595) (for DECK B this is the serial in of the 2 lower 595's)
 
 11. ST_CP (latch pin 595)
 12. SH_CP (clock input 595)
-13. GND
+13. GND (For DECK B this is the serial in for the 4 upper 595's)
 14. GND
 15. GND
 16. LED V1 (5v but can just be 3.v)
