@@ -149,22 +149,26 @@ const int ledMap[64] = {
   (FX_CHIP_NR*8 + 2), // 2,
   (FX_CHIP_NR*8 + 3), // 3,
   (FX_CHIP_NR*8 + 4), // 4,
-  6,7,8,9, // not used on FX chip
-  (CUP_CHIP_NR*8+4 - 1), // 9
-  11,
-  (CUP_CHIP_NR*8+5 - 1), // 11
-  13,
-  (CUP_CHIP_NR*8+6 - 1), // 13
-  15,
-  (CUP_CHIP_NR*8+7 - 1), // 15
-  17,
-  18,
-  19,
-  20,
-  21,
-  22,
-  23,
-  24,
+  6,7,8, // not used on FX chip
+  
+  (-1),  // 8
+  (CUP_CHIP_NR*8 + 7), // 9 - SHIFT
+  (-1), // 10
+  (CUP_CHIP_NR*8 + 4), // 11 - SYNC
+  (-1), // 12
+  (CUP_CHIP_NR*8 + 5), // 13 - CUE
+  (-1), // 13
+  (CUP_CHIP_NR*8 + 6), // 15 - PLAY
+  
+  (-1), // 16
+  (CUP_CHIP_NR*8 + 0), // 17 - S1
+  (-1), // 18
+  (CUP_CHIP_NR*8 + 1), // 19 - S2
+  (-1), // 20
+  (CUP_CHIP_NR*8 + 2), // 21 - S3
+  (-1), // 22
+  (CUP_CHIP_NR*8 + 3), // 23 - S4
+  
   (LP_CHIP_NR*8 + 8 - 1), // 24
   (LP_CHIP_NR*8 + 8 - 2), // 25
   (LP_CHIP_NR*8 + 8 - 3), // 26
@@ -419,9 +423,9 @@ void readFXKnobs () {
 void readJogPress () {
   int jogRead = analogRead(touchPin);
   jogHistory = 0.2 * jogRead + 0.8 * jogHistory;
-  Serial.print(jogHistory);
-  Serial.print("\t");
-  Serial.println((jogHistory <= jogPressThresh) ? 100 : 0);
+//  Serial.print(jogHistory);
+//  Serial.print("\t");
+//  Serial.println((jogHistory <= jogPressThresh) ? 100 : 0);
   bool newJogPressState = (jogHistory <= jogPressThresh);  // jog push
   if (newJogPressState != jogPressState) {
     jogPressState = newJogPressState;
