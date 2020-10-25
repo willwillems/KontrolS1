@@ -2,42 +2,25 @@
 #include <SPI.h>
 #include <Encoder.h>
 
-// 165
-// Chip pin 2 (CP)   goes to SCK   (D13)
-// Chip pin 9 (Q7)   goes to MISO  (D12)
-// 595
-// Chip pin 11 (SH)  goes to SCK   (D13)
-// Chip pin 14 (DS)  goes to MOSI  (D11)
+#include "unit_c.h"
+
+#define debug 0
 
 #define latchPinIn 9 // 74HC165
 #define latchPinOut 8 // 74HC595
-
 #define cePin 10 // 74HC165 & 74HC595
 
 #define faderPin 19
 
 #define touchPin 14
 
-#define FX_PINS 15, 16, 17, 17
+#define FX_PINS 15, 16, 17, 18
 #define FX_PINS_CC 10, 11, 12, 13
 
-#define debug 1
-// cue sample butts -hotcue -RD -lD -LOOP Upper buts - status and offset - 0
-#define LEDS_SERIAL_OFF_STATE 0b00000000, 0b01010101, 0b11111111, 0b11111111, 0b00000000, 0b11000000, 0b00000000
-#define BUTTONS_SERIAL_OFF_STATE 0b00000000, 0b00000000, 0b00000000, 0b00001100
+// Channel number for MIDI messagess
+const int channelNumber = 1;
 
-#define CUP_CHIP_NR 0
-#define CUE_CHIP_NR 1
-#define RDG_CHIP_NR 2
-#define LDG_CHIP_NR 3
-#define DISP_CHIP_NR 4
-#define LP_CHIP_NR 5
-#define FX_CHIP_NR 6
-
-
-const int channelNumber = 1; // MIDI channel
-
-// IC ammount
+// IC ammount for serial data
 const int ica595 = 7;
 const int ica165 = 4;
 
@@ -47,85 +30,18 @@ byte ledsState[ica595] = { LEDS_SERIAL_OFF_STATE };
 const byte buttonsOffState[ica165] = { BUTTONS_SERIAL_OFF_STATE };
 byte buttonsState[ica165] = { BUTTONS_SERIAL_OFF_STATE };
 
-//const byte digitStates[22] = {
-//  // .32
-//  0b00011000,
-//  0b10100100,
-//  // .16
-//  0b01111001,
-//  0b10010000,
-//  // .8
-//  0b11111011,
-//  0b10000000,
-//  // .4
-//  0b11111011,
-//  0b10001011,
-//  // .2
-//  0b11111011,
-//  0b10100100,
-//  // 1
-//  0b11111111,
-//  0b11001111,
-//  // 2
-//  0b11111111,
-//  0b10100100,
-//  // 4
-//  0b11111111,
-//  0b10001011,
-//  // 8
-//  0b11111111,
-//  0b10000000,
-//  // 16
-//  0b01111101,
-//  0b10010000,
-//  // 32
-//  0b00011100,
-//  0b10100100
-//};
-
-// 1.RB
-// 2.CC
-// 3.RT
-// 4.CT
-// 5.CB
-// 6.LB
-// 7.LT
-// 8.DOT
-
 const byte digitStates[22] = {
-  // .32
-  0b10000011,
-  0b00000110,
-  // .16
-  0b00100001,
-  0b01011110,
-  // .8
-  0b00000000,
-  0b11111111,
-  // .4
-  0b00011100,
-  0b11111111,
-  // .2
-  0b10000010,
-  0b11111111,
-  // 1
-  0b01011111,
-  0b11111111,
-  // 2
-  0b10000011,
-  0b11111111,
-  // 4
-  0b00011101,
-  0b11111111,
-  // 8
-  0b00000001,
-  0b11111111,
-  // 16
-  0b00100001,
-  0b01011111,
-  // 32
-  0b10000011,
-  0b00000111
+  DIGIT_STATE_1_32,
+  DIGIT_STATE_1_16,
+  DIGIT_STATE_1_8,
+  DIGIT_STATE_1_4,
+  DIGIT_STATE_1_2,
+  DIGIT_STATE_1,
+  DIGIT_STATE_2,
+  DIGIT_STATE_4,
+  DIGIT_STATE_8,
+  DIGIT_STATE_16,
+  DIGIT_STATE_32
 };
 
 //const int ledMap[64] = {
@@ -179,6 +95,83 @@ const int ledMap[64] = {
   (LP_CHIP_NR*8 + 8 - 8), // 31
 };
 
+const int buttonMap[32] = {
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+
+  23,
+  24, // OFFSET UP
+  25, // OFFSET DOWNN
+  26, // SSET LOOP
+  27, // ACTIVE LOOP
+  28,
+  29,
+  30,
+
+  (8 + 6), // CUP4
+  15, // play
+  22, // C ( NOW MAPPED TO LOAD
+  17,
+  18, // LOOP IN
+  19,
+  20, // LOOP OUT
+  31,
+  
+  13, // random
+  16, // random
+  7,
+  (8 + 0), // CUP1
+  9, // SHIFT
+  (8 + 2), // CUP2
+  11, // SYNC
+  (8 + 4) // CUP3
+};
+// 13 CUE
+
+//const int buttonMap[32] = {
+//  0,
+//  1,
+//  2,
+//  3,
+//  4,
+//  5,
+//  6,
+//  7,
+//
+//  8,
+//  9,
+//  10,
+//  11,
+//  12,
+//  13,
+//  14,
+//  15,
+//
+//  16,
+//  17,
+//  18,
+//  19,
+//  20,
+//  21,
+//  22,
+//  23,
+//  
+//  24,
+//  25,
+//  26,
+//  27,
+//  28,
+//  29,
+//  30,
+//  31
+//};
+
 // LED OFF STATES from least significant bit (last one so notation is in reverse)
 // -- BYTE [5]: 0b01010101 --
 // CUE1 green - CUE1 blue - CUE2 green - CUE2 blue - CUE3 green - CUE3 blue - CUE4 green - CUE4 blue 
@@ -205,18 +198,19 @@ int fxPinsState[4] = {64, 64, 64, 64};
 int faderState = 0;
 
 // depends on resistor value 
-const int jogPressThresh = 480;
+const int jogPressThresh = 525;
 bool jogPressState = false;
-int jogHistory = 1023;
 
 void setup () {
   // setup SPI
   SPI.begin ();
   SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
-  // set latch pins as outpur
+  // set latch pins as output
   pinMode(latchPinIn, OUTPUT);
   pinMode(latchPinOut, OUTPUT);
+  
   pinMode(cePin, OUTPUT);
+  
   // set fader pin as input
   pinMode(faderPin, INPUT);
   // set jog touch as input
@@ -228,6 +222,7 @@ void setup () {
   // set latch pins to initial state
   digitalWrite (latchPinIn, HIGH);
   digitalWrite (latchPinOut, HIGH);
+  digitalWrite (cePin, HIGH);
   // setup handlers for USB MIDI
   usbMIDI.setHandleNoteOn(handleNoteOn);
   usbMIDI.setHandleNoteOff(handleNoteOff);
@@ -239,40 +234,39 @@ void setup () {
     // flip bit at position
     setLedState(i, 1);
     sendLedsState();
-    delay(10);
+    delay(25);
   }
 
   clearLedsState();
-  setDigitState(8); // -8
+  setDigitState(8); // DEBUG
   sendLedsState();
 }
 
 void loop () {
   readButtonState();
   readEncoders();
-  // readTempoFader();
+  readTempoFader();
   readFXKnobs();
   readJogPress();
-  delay(1);
-  
   // read USB MIDI
   usbMIDI.read();
 }
 
 void readButtonState () {
   byte newButtonsState[ica165];
-  digitalWrite (latchPinIn, LOW);    // pulse the parallel load latch
+  // pulse the parallel load latch
+  digitalWrite (latchPinIn, LOW);
   delayMicroseconds(5); // doesn't break when we remove this
   digitalWrite (latchPinIn, HIGH);
   delayMicroseconds(5); // doesn't break when we remove this
 
-  
   digitalWrite (cePin, LOW);
   
   // get new button state
   for (int i = 0; i < ica165; i++) {
     newButtonsState[i] = SPI.transfer(0b00000000);
   }
+
   digitalWrite (cePin, HIGH);
   
   // compare to previous button state and send midi messages
@@ -284,24 +278,16 @@ void readButtonState () {
     const bool newState = bitRead(newButtonsState[arrayEl], byteEl);
     if (newState != oldState) {
       if (newState ? !offState : offState) {
-        usbMIDI.sendNoteOn(i, 127, channelNumber);
+        usbMIDI.sendNoteOn(buttonMap[i], 127, channelNumber);
       } else {
-        usbMIDI.sendNoteOff(i, 127, channelNumber);
+        usbMIDI.sendNoteOff(buttonMap[i], 127, channelNumber);
       }
       
       if (debug) {
-        Serial.print("Button nr:");
+        Serial.print("Button nr: ");
         Serial.print(i);
-        Serial.print(" Array: ");
-        Serial.print(arrayEl);
-        Serial.print(" byte: ");
-        Serial.print(byteEl);
-        Serial.print(" off: ");
-        Serial.print(offState);
-        Serial.print(" old: ");
-        Serial.print(oldState);
-        Serial.print(" new: ");
-        Serial.print(newState);
+        Serial.print(" Map: ");
+        Serial.print(buttonMap[i]);
         Serial.print(" now: ");
         Serial.println(newState ? !offState : offState);
       }
@@ -316,20 +302,20 @@ void readButtonState () {
 void sendLedsState () {
   // set latch pin 595 to fill registers with state
   digitalWrite (latchPinOut, LOW);
-  // delay(1); // not needed, or can be mS
+  delayMicroseconds(400);
+  // delay(1); // not needed, or can be mS, EDIT: needed for C unit
   // send state
   for (int i = 0; i < ica595; i++) {
     SPI.transfer(ledsState[i]);
   }
+  Serial.println("\n");
   // load state into outputs
   digitalWrite (latchPinOut, HIGH);
 }
 
 void setLedState (int ledNumber, bool newState) {
   if (ledNumber < 0) {
-    if (debug) {
-      Serial.println("Led number < 0");
-    }
+    if (debug) { Serial.println("Led number < 0"); }
     return;
   }
   int arrayEl = ledNumber/8;
@@ -338,22 +324,18 @@ void setLedState (int ledNumber, bool newState) {
   bitWrite(ledsState[arrayEl], byteEl, (newState ? !offState : offState));
 
   if (debug) {
-    Serial.print("Led nr:");
+    Serial.print("Led nr: ");
     Serial.print(ledNumber);
-    Serial.print(" Array: ");
-    Serial.print(arrayEl);
-    Serial.print(" byte: ");
-    Serial.print(byteEl);
-    Serial.print(" message: ");
-    Serial.println(ledsState[arrayEl], BIN);
+    Serial.print(" State: ");
+    Serial.println(newState);
   }
 }
 
 void setDigitState (int newState) {
   byte leftDigit = digitStates[(newState * 2)];
   byte rightDigit = digitStates[(newState * 2) + 1];
-  ledsState[2] = leftDigit;
-  ledsState[3] = rightDigit;
+  ledsState[LDG_CHIP_NR] = leftDigit;
+  ledsState[RDG_CHIP_NR] = rightDigit;
 
   if (debug) {
     Serial.print("Left digit: ");
@@ -370,7 +352,7 @@ void clearLedsState () {
 void readEncoders () {
   int encoderLeftPosition = (encoderLeft.read() / 4);
   if (encoderLeftPosition != 0) {
-    Serial.print("encoder left position: ");
+    Serial.print("Encoder left position: ");
     Serial.println(encoderLeftPosition);
     // send encoder midi note
     if (encoderLeftPosition > 0) { usbMIDI.sendControlChange(0, 63, channelNumber); }
@@ -381,7 +363,7 @@ void readEncoders () {
   // read and proccess right encoder
   int encoderRightPosition = (encoderRight.read() / 4);
   if (encoderRightPosition != 0) {
-    Serial.print("encoder right position: ");
+    Serial.print("Encoder right position: ");
     Serial.println(encoderRightPosition);
     // send encoder midi note
     if (encoderRightPosition > 0) { usbMIDI.sendControlChange(1, 63, channelNumber); }
@@ -392,7 +374,7 @@ void readEncoders () {
   // read and proccess jog encoder
   int encoderJogPosition = (encoderJog.read() / 4); // only does -4 and 4
   if (encoderJogPosition != 0) {
-    Serial.print("encoder jog position: ");
+    Serial.print("Encoder jog position: ");
     Serial.println(encoderJogPosition);
     // send encoder midi note55
     if (encoderJogPosition > 0) { usbMIDI.sendControlChange(2, 63, channelNumber); }
@@ -422,11 +404,11 @@ void readFXKnobs () {
 
 void readJogPress () {
   int jogRead = analogRead(touchPin);
-  jogHistory = 0.2 * jogRead + 0.8 * jogHistory;
-//  Serial.print(jogHistory);
+//
+//  Serial.print(jogRead);
 //  Serial.print("\t");
-//  Serial.println((jogHistory <= jogPressThresh) ? 100 : 0);
-  bool newJogPressState = (jogHistory <= jogPressThresh);  // jog push
+//  Serial.println((jogRead <= jogPressThresh) ? 100 : 0);
+  bool newJogPressState = (jogRead <= jogPressThresh);  // jog push
   if (newJogPressState != jogPressState) {
     jogPressState = newJogPressState;
     usbMIDI.sendControlChange(55, jogPressState ? 127 : 0, channelNumber);
@@ -435,7 +417,7 @@ void readJogPress () {
 
 void handleNoteOn(byte channel, byte note, byte velocity) {
   if (channel != channelNumber) { return; } 
-  int led = getNoteLed(note, velocity, true);
+  int led = getNoteLed(buttonMap[note], velocity, true);
   setLedState(led, 1);
   sendLedsState();
   if (debug) {
@@ -452,7 +434,7 @@ void handleNoteOn(byte channel, byte note, byte velocity) {
 
 void handleNoteOff(byte channel, byte note, byte velocity) {
   if (channel != channelNumber) { return; }
-  int led = getNoteLed(note, velocity, false);
+  int led = getNoteLed(buttonMap[note], velocity, false);
   setLedState(led, 0);
   sendLedsState();
   if (debug) {
