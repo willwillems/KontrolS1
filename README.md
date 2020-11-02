@@ -160,4 +160,6 @@ Contains adapter from 1.25mm JST to OLED, a step-up to 12V and some passive comp
 4. MOSI
 5. SS-SCREEN
 6. VCC
+7. DC
+8. RST
 ```
