@@ -163,3 +163,7 @@ Contains adapter from 1.25mm JST to OLED, a step-up to 12V and some passive comp
 7. DC
 8. RST
 ```
+
+# Screen
+
+The screen uses https://github.com/ErikMinekus/traktor-api-client to get data from traktor + a local server to send it to the teensy over serial.
