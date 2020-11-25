@@ -10,11 +10,11 @@ const parser = serialport.pipe(new Readline({
 serialport.on("open", () => {
   console.log('serial port open')
 });
-parser.on('data', data => {
-  console.log('got word from arduino:', data)
-  // get char codes
-  // console.log([...data].map(c => c.charCodeAt(0)))
-});
+// parser.on('data', data => {
+//   console.log('got word from arduino:', data)
+//   // get char codes
+//   // console.log([...data].map(c => c.charCodeAt(0)))
+// });
 
 const port = 8080
 // SerialPort.list().then(
