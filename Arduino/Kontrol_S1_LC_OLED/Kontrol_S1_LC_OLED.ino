@@ -1,9 +1,11 @@
 #include <SPI.h>
 #include <Encoder.h>
 
-#include "unit_c.h"
+#include "unit_d.h"
 
-#define debug 0
+// #define DEBUG
+
+// #define SCREEN
 
 #define latchPinIn 9 // 74HC165
 #define latchPinOut 8 // 74HC595
@@ -15,29 +17,6 @@
 
 #define FX_PINS 15, 16, 17, 18
 #define FX_PINS_CC 10, 11, 12, 13
-
-#define TRACK_TITLE 0
-#define TRACK_ARTIST 1
-#define TRACK_BPM 2
-#define TRACK_TIME 3
-#define TRACK_PROGRESS 4
-
-#include <Arduino.h>
-#include <U8g2lib.h>
-
-#ifdef U8X8_HAVE_HW_SPI
-#include <SPI.h>
-#endif
-#ifdef U8X8_HAVE_HW_I2C
-#include <Wire.h>
-#endif
-
-U8G2_SH1122_256X64_F_4W_HW_SPI u8g2(U8G2_R2, /* cs=*/ A10, /* dc=*/ A12, /* reset=*/ A11);        // Enable U8G2_16BIT in u8g2.h
-
-const int screenWidth = 256;
-const int screenHeight = 64;
-
-const int barHeight = 3; // px
 
 // Channel number for MIDI messagess
 const int channelNumber = 1;
@@ -51,6 +30,7 @@ byte ledsState[ica595] = { LEDS_SERIAL_OFF_STATE };
 
 const byte buttonsOffState[ica165] = { BUTTONS_SERIAL_OFF_STATE };
 byte buttonsState[ica165] = { BUTTONS_SERIAL_OFF_STATE };
+unsigned short buttonReadings[ica165 * 8];
 
 const byte digitStates[22] = {
   DIGIT_STATE_1_32,
@@ -103,98 +83,7 @@ const int ledMap[64] = {
   (LP_CHIP_NR*8 + 8 - 8), // 31
 };
 
-// DECK D
-//const int buttonMap[32] = {
-//  0,
-//  1,
-//  2,
-//  3,
-//  4,
-//  5,
-//  6,
-//  7,
-//
-//  23,
-//  24, // OFFSET UP
-//  25, // OFFSET DOWNN
-//  26, // SSET LOOP
-//  27, // ACTIVE LOOP
-//  28,
-//  29,
-//  30,
-//
-//  (8 + 6), // CUP4
-//  15, // play
-//  22, // C ( NOW MAPPED TO LOAD
-//  17,
-//  18, // LOOP IN
-//  19,
-//  20, // LOOP OUT
-//  31,
-//  
-//  13, // random
-//  16, // random
-//  7,
-//  (8 + 0), // CUP1
-//  9, // SHIFT
-//  (8 + 2), // CUP2
-//  11, // SYNC
-//  (8 + 4) // CUP3
-//};
-// 13 CUE
-
-// DECK C
-const int buttonMap[32] = {
-  0,
-  1,
-  2,
-  3,
-  4,
-  5,
-  6,
-  7,
-
-  24,       // tempo range up
-  25,       // tempo range down
-  26,       // encr
-  27,       // encl
-  12,
-  13,
-  14,
-  15,
-
-  16,       // Deck shift toggle
-  17,       // S1
-  18,       // Loop in
-  19,       // S2
-  20,       // loop out
-  21,       // S3
-  22,       // Load
-  23,       // S4
-  
-  (8 + 0),  // CUE1
-  9,        // shift
-  (8 + 2),  // CUE2
-  11,       // sync
-  (8 + 4),  // CUE3
-  13,       // cue
-  (8 + 6),  // CUE4
-  15        // play
-};
-
-// LED OFF STATES from least significant bit (last one so notation is in reverse)
-// -- BYTE [5]: 0b01010101 --
-// CUE1 green - CUE1 blue - CUE2 green - CUE2 blue - CUE3 green - CUE3 blue - CUE4 green - CUE4 blue 
-// -- BYTE [4]: 0b00000000 --
-// Sample 1 - Sample 2 - Sample 3 - Sample 4 - SYNC - CUE - PLAY - SHIFT
-// -- BYTE [3]: 0b11000000 --
-// ON AIR - SAMPLES - DECK A/B - DECK C/D - KEYLOCK - MASTER - TEMPO OFFSET UP - TEMPO OFFSET DOWN
-// -- BYTE [2]: 0b00000000 --
-// LOOP IN - LOOP OUT - TOGGLE DECK C/D - LOAD - NONE - NONE - NONE -NONE
-// -- BYTE [1]: 0b11111111 -- LEFT DIGIT 
-// UP-MIDDLE - UP-RIGHT - DOT - UP-LEFT - DOWN-LEFT - DONW-MIDDLE - MIDDLE-MIDDLE - DOWN-RIGHT
-// -- BYTE [0]: 0b11111111 -- RIGHT DIGIT
-// DM - DL - UL - UM - UR - DR - MM - DOT
+const int buttonMap[32] = { BUTTON_MAP };
 
 Encoder encoderLeft(2, 3);
 Encoder encoderRight(4, 5);
@@ -211,21 +100,13 @@ int faderState = 0;
 const int jogPressThresh = 525;
 bool jogPressState = false;
 
-char trackTimeLeft[6] = {'0', '0', ':', '0', '0', '\0'};
-int trackLength = 100;
-int trackProgress = 0;
-
 void setup () {
+  #ifdef DEBUG
   Serial.begin(9600);
-  u8g2.begin();
-
-  setTrackName("There is A", false);
-  setArtistName("Mall Grab", false);
-  setTrackTime("06:45", false);
-  setTempoValue("128.00", false);
- 
-  drawBarBox();
-  u8g2.sendBuffer();
+  #endif
+  #ifdef SCREEN
+  screenSetup();
+  #endif
   
   // setup SPI
   SPI.begin ();
@@ -252,6 +133,10 @@ void setup () {
   usbMIDI.setHandleNoteOn(handleNoteOn);
   usbMIDI.setHandleNoteOff(handleNoteOff);
   usbMIDI.setHandleControlChange(handleControlChange);
+
+  // fill the history array (better to #define this during compile?)
+  for (int i=0;i<(ica165 * 8);i++) {buttonReadings[i] = bitRead(buttonsOffState[i/8], i%8);}
+  
   // setup led state and start-up animation
   clearLedsState();
   
@@ -278,7 +163,8 @@ void loop () {
 }
 
 void readButtonState () {
-  byte newButtonsState[ica165];
+  
+  byte newButtonReadings[ica165];
   // pulse the parallel load latch
   digitalWrite (latchPinIn, LOW);
   delayMicroseconds(5); // doesn't break when we remove this
@@ -286,14 +172,15 @@ void readButtonState () {
   delayMicroseconds(5); // doesn't break when we remove this
 
   digitalWrite (cePin, LOW);
+  // delayMicroseconds(100);
+  delay(1); // C BREAKS ELSE
   
   // get new button state
   for (int i = 0; i < ica165; i++) {
-    newButtonsState[i] = SPI.transfer(0b00000000);
+    newButtonReadings[i] = SPI.transfer(0b00000000);
   }
 
   digitalWrite (cePin, HIGH);
-  delay(1); // doesn't break when we remove this
   
   // compare to previous button state and send midi messages
   for (int i = 0; i < (ica165 * 8); i++) {
@@ -301,27 +188,35 @@ void readButtonState () {
     const int byteEl = i%8;
     const bool offState = bitRead(buttonsOffState[arrayEl], byteEl);
     const bool oldState = bitRead(buttonsState[arrayEl], byteEl);
-    const bool newState = bitRead(newButtonsState[arrayEl], byteEl);
-    if (newState != oldState) {
-      if (newState ? !offState : offState) {
-        usbMIDI.sendNoteOn(buttonMap[i], 127, channelNumber);
-      } else {
-        usbMIDI.sendNoteOff(buttonMap[i], 127, channelNumber);
-      }
-      
-      if (debug) {
+    const bool newReading = bitRead(newButtonReadings[arrayEl], byteEl);
+
+    // add new reading
+    // thiss might be inverse
+    if (newReading == 1 ? !offState : offState) { buttonReadings[i] = (~((~buttonReadings[i]) << 1)); }
+    else { buttonReadings[i] = (buttonReadings[i] << 1); }
+
+    // detect falling edge (too many readings?)
+    if (buttonReadings[i] == 0b1000000000000000 || buttonReadings[i] == 0b0000000000000001) {
+      // falling edge
+      if (buttonReadings[i] == 0b1000000000000000) { usbMIDI.sendNoteOff(buttonMap[i], 127, channelNumber); }
+      else if (buttonReadings[i] == 0b0000000000000001) { usbMIDI.sendNoteOn(buttonMap[i], 127, channelNumber); }
+//      Serial.print(buttonReadings[i], BIN);
+//      Serial.print(" ");
+//      Serial.println(millis());
+      #ifdef DEBUG
         Serial.print("Button nr: ");
         Serial.print(i);
         Serial.print(" Button map: ");
         Serial.print(buttonMap[i]);
         Serial.print(" now: ");
-        Serial.println(newState ? !offState : offState);
-      }
+        Serial.println(buttonReadings[i] ? !offState : offState);
+      #endif
     }
+    
   }
 
   for (int i = 0; i < ica165; i++) {
-    buttonsState[i] = newButtonsState[i];
+    buttonsState[i] = newButtonReadings[i];
   }
 }
 
@@ -342,7 +237,9 @@ void sendLedsState () {
 
 void setLedState (int ledNumber, bool newState) {
   if (ledNumber < 0) {
-    if (debug) { Serial.println("Led number < 0"); }
+    #ifdef DEBUG
+      Serial.println("Led number < 0");
+    #endif
     return;
   }
   int arrayEl = ledNumber/8;
@@ -350,12 +247,12 @@ void setLedState (int ledNumber, bool newState) {
   bool offState = bitRead(ledsOffState[arrayEl], byteEl);
   bitWrite(ledsState[arrayEl], byteEl, (newState ? !offState : offState));
 
-  if (debug) {
+  #ifdef DEBUG
     Serial.print("Set LED state: nr: ");
     Serial.print(ledNumber);
     Serial.print(", state: ");
     Serial.println(newState);
-  }
+  #endif
 }
 
 void setDigitState (int newState) {
@@ -364,12 +261,12 @@ void setDigitState (int newState) {
   ledsState[LDG_CHIP_NR] = leftDigit;
   ledsState[RDG_CHIP_NR] = rightDigit;
 
-  if (debug) {
+  #ifdef DEBUG
     Serial.print("Left digit: ");
     Serial.print(leftDigit, BIN);
     Serial.print(" right digit: ");
     Serial.println(rightDigit, BIN);
-  }
+  #endif
 }
 
 void clearLedsState () {
@@ -379,10 +276,10 @@ void clearLedsState () {
 void readEncoders () {
   int encoderLeftPosition = (encoderLeft.read() / 4);
   if (encoderLeftPosition != 0) {
-    if (debug) {
+    #ifdef DEBUG
       Serial.print("Encoder left position: ");
       Serial.println(encoderLeftPosition);
-    }
+    #endif
     // send encoder midi note
     if (encoderLeftPosition > 0) { usbMIDI.sendControlChange(0, 63, channelNumber); }
     else { usbMIDI.sendControlChange(0, 65, channelNumber); }
@@ -392,10 +289,10 @@ void readEncoders () {
   // read and proccess right encoder
   int encoderRightPosition = (encoderRight.read() / 4);
   if (encoderRightPosition != 0) {
-    if (debug) {
+    #ifdef DEBUG
       Serial.print("Encoder right position: ");
       Serial.println(encoderRightPosition);
-    }
+    #endif
     // send encoder midi note
     if (encoderRightPosition > 0) { usbMIDI.sendControlChange(1, 63, channelNumber); }
     else { usbMIDI.sendControlChange(1, 65, channelNumber); }
@@ -405,10 +302,10 @@ void readEncoders () {
   // read and proccess jog encoder
   int encoderJogPosition = (encoderJog.read() / 4); // only does -4 and 4
   if (encoderJogPosition != 0) {
-    if (debug) {
+    #ifdef DEBUG
       Serial.print("Encoder jog position: ");
       Serial.println(encoderJogPosition);
-    }
+    #endif
     // send encoder midi note55
     if (encoderJogPosition > 0) { usbMIDI.sendControlChange(2, 63, channelNumber); }
     else { usbMIDI.sendControlChange(2, 65, channelNumber); }
@@ -453,7 +350,7 @@ void handleNoteOn(byte channel, byte note, byte velocity) {
   int led = getNoteLed(note, velocity, true);
   setLedState(led, 1);
   sendLedsState();
-  if (debug) {
+  #ifdef DEBUG
     Serial.print("Note On, ch=");
     Serial.print(channel, DEC);
     Serial.print(", note=");
@@ -462,7 +359,7 @@ void handleNoteOn(byte channel, byte note, byte velocity) {
     Serial.print(led, DEC);
     Serial.print(", velocity=");
     Serial.println(velocity, DEC);
-  }
+  #endif
 }
 
 void handleNoteOff(byte channel, byte note, byte velocity) {
@@ -470,14 +367,14 @@ void handleNoteOff(byte channel, byte note, byte velocity) {
   int led = getNoteLed(note, velocity, false);
   setLedState(led, 0);
   sendLedsState();
-  if (debug) {
+  #ifdef DEBUG
     Serial.print("Note Off, ch=");
     Serial.print(channel, DEC);
     Serial.print(", note=");
     Serial.print(note, DEC);
     Serial.print(", velocity=");
     Serial.println(velocity, DEC);
-  }
+  #endif
 }
 
 void handleControlChange(byte channel, byte control, byte value) {
@@ -486,21 +383,23 @@ void handleControlChange(byte channel, byte control, byte value) {
     setDigitState(value);
     sendLedsState(); 
   }
-  if (debug) {
+  #ifdef DEBUG
     Serial.print("Control Change, ch=");
     Serial.print(channel, DEC);
     Serial.print(", control=");
     Serial.print(control, DEC);
     Serial.print(", value=");
     Serial.println(value, DEC);
-  }
+  #endif
 }
 
 int getNoteLed(int note, int velocity, bool on) {
   if (note == 8 || note == 10 || note == 12 || note == 14) {
-    Serial.print("CUE");
-    Serial.print(note - 8);
-    // Serial.print((velocity == 6) ? 0 : 1);
+    #ifdef DEBUG
+      Serial.print("CUE");
+      Serial.print(note - 8);
+      Serial.print((velocity == 6) ? 0 : 1);
+    #endif
     if (true) {
       // Loop
       if      (velocity == 6) {

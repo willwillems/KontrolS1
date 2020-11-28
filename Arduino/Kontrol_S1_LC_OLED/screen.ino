@@ -1,3 +1,31 @@
+#define TRACK_TITLE 0
+#define TRACK_ARTIST 1
+#define TRACK_BPM 2
+#define TRACK_TIME 3
+#define TRACK_PROGRESS 4
+
+#include <Arduino.h>
+#include <U8g2lib.h>
+
+// remove this??
+#ifdef U8X8_HAVE_HW_SPI
+#include <SPI.h>
+#endif
+#ifdef U8X8_HAVE_HW_I2C
+#include <Wire.h>
+#endif
+
+U8G2_SH1122_256X64_F_4W_HW_SPI u8g2(U8G2_R2, /* cs=*/ A10, /* dc=*/ A12, /* reset=*/ A11);        // Enable U8G2_16BIT in u8g2.h
+
+const int screenWidth = 256;
+const int screenHeight = 64;
+
+const int barHeight = 3; // px
+
+char trackTimeLeft[6] = {'0', '0', ':', '0', '0', '\0'};
+int trackLength = 100;
+int trackProgress = 0;
+
 void serialEvent() {
   while (Serial.available()) {
     byte type = Serial.read();
@@ -35,6 +63,18 @@ void serialEvent() {
       Serial.println("Invalid type");
     }
   }
+}
+
+void screenSetup () {
+  u8g2.begin();
+
+  setTrackName("There is A", false);
+  setArtistName("Mall Grab", false);
+  setTrackTime("06:45", false);
+  setTempoValue("128.00", false);
+ 
+  drawBarBox();
+  u8g2.sendBuffer();
 }
 
 void setTrackName (char *name, bool update) { // todo make update optional
