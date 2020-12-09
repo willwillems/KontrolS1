@@ -147,6 +147,44 @@ The custom FX PCB has the same layout on both sides so only one version is requi
 16. FX_DW
 ```
 
+## Parts
+
+These simplified BOM's are for the MK4 releases of the brain and pot boards.
+
+### Brain board
+
+These are the parts needed to populate 1 brain board, to convert one S4 to two S1 units you'd need these parts x2.
+
+| Part                                   | Amount | Value |
+| -------------------------------------- | ------ | ----- |
+| Molex Picoblade (1.25mm) 10-pin        | 3      |       |
+| Molex Picoblade (1.25mm) 8-pin         | 1      |       |
+| Molex Picoblade (1.25mm) 6-pin         | 3      |       |
+| Molex Picoblade (1.25mm) 4-pin         | 2      |       |
+| M3 metal standoffs                     | 4      |       |
+| USB-B socket                           | 1      |       |
+| Teensy LC                              | 1      |       |
+| Capacitor US 1206                      | 1      | 100nF |
+| Resistor US 1206 (0805 compatible)     | 1      | 1M    |
+
+The 1M resistor might need a higher value.
+
+### Pot board
+
+These are the parts needed to populate 1 brain board, to convert one S4 to two S1 units you'd need these parts x2. The standoffs needed are already included with the brain BOM.
+
+| Part                                   | Amount | Value |
+| -------------------------------------- | ------ | ----- |
+| Molex Picoblade (1.25mm) 10-pin        | 1      |       |
+| Molex Picoblade (1.25mm) 6-pin         | 1      |       |
+| Resistor US 0805                       | 5      | 82    |
+| Resistor US 0805                       | 8      | 10K   |
+| 74HC595D                               | 1      |       |
+| 74HC165D                               | 1      |       |
+| Capacitor US 1206                      | 6      | 100nF |
+
+The four capacitors for the potentiometers might need a lower value.
+
 ## Custom OLED PCB
 
 Contains adapter from 1.25mm JST to OLED, a step-up to 12V and some passive components the OLED driver needs.
