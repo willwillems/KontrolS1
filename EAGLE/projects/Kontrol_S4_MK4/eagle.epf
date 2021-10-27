@@ -1,5 +1,5 @@
 [Eagle]
-Version="09 05 02"
+Version="09 06 01"
 Platform="Mac OS X"
 Globals="Globals"
 Desktop="Desktop"
@@ -300,10 +300,5 @@ UsedLibrary="/Users/admin/Documents/EAGLE/libraries/SparkFun-Eagle-Libraries-mas
 UsedLibrary="/Users/admin/Documents/EAGLE/libraries/SparkFun-Eagle-Libraries-master/User-Submitted.lbr"
 UsedLibrary="/Users/admin/Documents/EAGLE/libraries/adafruit-Adafruit-Eagle-Library-4abf84c/adafruit.lbr"
 
-[Win_1]
-Type="Control Panel"
-Number=0
-
 [Desktop]
 Screen="1440 900"
-Window="Win_1"
