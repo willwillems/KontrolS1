@@ -161,7 +161,7 @@ These are the parts needed to populate 1 brain board, to convert one S4 to two S
 | Molex Picoblade (1.25mm) 8-pin         | 1      |       |
 | Molex Picoblade (1.25mm) 6-pin         | 3      |       |
 | Molex Picoblade (1.25mm) 4-pin         | 2      |       |
-| M3 metal standoffs                     | 4      | 20mm  |
+| M3 metal standoffs                     | 4      | 15mm  |
 | M3 metal screws                        | 8      | 8mm   |
 | USB-B socket                           | 1      |       |
 | Teensy LC                              | 1      |       |
