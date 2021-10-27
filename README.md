@@ -119,11 +119,10 @@ WHITE. SIGNAL (analog read: 800~900 off, 1023 on)
 - VCC should be 3.3v, not 5v. The 595 works with 5v and you will not fry the LED's but the 165 will not work and you might damage it.
 - You can easily run the 165 and 595 chips with hardware SPI.
 - The left and right circuit board are not identical at all though the connectors appear to be.
-- The left circuit seems to be "skipping" the first 4 SPI packages (no idea what is going on here).
 
 ## Custom FX PCB
 
-The custom FX PCB has the same layout on both sides so only one version is required (if it has all both the L&R mounting holes). The custom FX PCB provides a 165 and 595 interface for the buttons and LED's respectively and a separate connector for the potentiometer signals.
+The custom FX PCB has the same layout on both sides so only one version is required (it has both the L&R mounting holes). The custom FX PCB provides a 165 and 595 interface for the buttons and LED's respectively and a separate connector for the potentiometer signals.
 
 ### Pinout
 
