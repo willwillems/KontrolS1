@@ -234,7 +234,7 @@ void setup () {
     // flip bit at position
     setLedState(i, 1);
     sendLedsState();
-    delay(25);
+    delay(100);
   }
 
   clearLedsState();
@@ -301,8 +301,9 @@ void readButtonState () {
 
 void sendLedsState () {
   // set latch pin 595 to fill registers with state
+  delayMicroseconds(5);
   digitalWrite (latchPinOut, LOW);
-  delayMicroseconds(400);
+  delayMicroseconds(5);
   // delay(1); // not needed, or can be mS, EDIT: needed for C unit
   // send state
   for (int i = 0; i < ica595; i++) {
@@ -404,7 +405,7 @@ void readFXKnobs () {
 
 void readJogPress () {
   int jogRead = analogRead(touchPin);
-//
+
 //  Serial.print(jogRead);
 //  Serial.print("\t");
 //  Serial.println((jogRead <= jogPressThresh) ? 100 : 0);
