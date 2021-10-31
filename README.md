@@ -2,6 +2,13 @@
 
 The following info is all about the S4 MK1, the MK2 has a different (non-panelized) PCB design and thus doesn't allow for reusing the original PCB's without serious modifications. The MK3 also has a single PCB for the mixer and deck sections.
 
+## Setup
+- Use the `Kontrol_S1_LC_OLED` sketch
+- Either `#include "unit_d.h"` or `#include "unit_c.h"` based on the unit
+- Uncomment `#define SCREEN` if using the OLED module
+- Edit the `MIDI_NAME` in the `name.c` file to the desired name (these cannot conflict with other S1 units you're using)
+- Flash the firmware
+
 ## Led off states
 All leds are controlled by a transistor activated by the 595 chip. However not all are connected the same way, sending 6 all-off byte packages (`0b00000000`) will turn some of the LED's on, these specific bits to be set to HIGH instead of LOW in order to be turned off.
 

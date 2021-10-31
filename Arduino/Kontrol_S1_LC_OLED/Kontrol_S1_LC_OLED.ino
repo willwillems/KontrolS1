@@ -1,7 +1,7 @@
 #include <SPI.h>
 #include <Encoder.h>
 
-#include "unit_d.h"
+#include "unit_c.h"
 
 // #define DEBUG
 
@@ -64,13 +64,13 @@ const int ledMap[64] = {
   (-1), // 13
   (CUP_CHIP_NR*8 + 6), // 15 - PLAY
   
-  (-1), // 16
+  (LP_CHIP_NR*8 + 2),  // 16      // load (formula might be bs)
   (CUP_CHIP_NR*8 + 0), // 17 - S1
   (-1), // 18
   (CUP_CHIP_NR*8 + 1), // 19 - S2
   (-1), // 20
   (CUP_CHIP_NR*8 + 2), // 21 - S3
-  (-1), // 22
+  (LP_CHIP_NR*8 + 3),  // 22      // C button (formula might be bs)
   (CUP_CHIP_NR*8 + 3), // 23 - S4
   
   (LP_CHIP_NR*8 + 8 - 1), // 24
@@ -172,8 +172,8 @@ void readButtonState () {
   delayMicroseconds(5); // doesn't break when we remove this
 
   digitalWrite (cePin, LOW);
-  // delayMicroseconds(100);
-  delay(1); // C BREAKS ELSE
+  delayMicroseconds(100);
+  // delay(1); // C BREAKS ELSE (seems false)
   
   // get new button state
   for (int i = 0; i < ica165; i++) {
@@ -225,7 +225,7 @@ void sendLedsState () {
   delayMicroseconds(5);
   digitalWrite (latchPinOut, LOW);
   delayMicroseconds(5);
-  // delay(1); // not needed, or can be mS, EDIT: needed for C unit
+  // delay(1); // not needed, or can be mS, EDIT: needed for C unit (or nah?)
   // send state
   for (int i = 0; i < ica595; i++) {
     SPI.transfer(ledsState[i]);
@@ -398,7 +398,7 @@ int getNoteLed(int note, int velocity, bool on) {
     #ifdef DEBUG
       Serial.print("CUE");
       Serial.print(note - 8);
-      Serial.print((velocity == 6) ? 0 : 1);
+      Serial.println((velocity == 6) ? 0 : 1);
     #endif
     if (true) {
       // Loop
