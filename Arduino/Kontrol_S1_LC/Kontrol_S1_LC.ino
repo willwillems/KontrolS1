@@ -76,13 +76,13 @@ const int ledMap[64] = {
   (-1), // 13
   (CUP_CHIP_NR*8 + 6), // 15 - PLAY
   
-  (-1), // 16
+  (26), // 16 - C
   (CUP_CHIP_NR*8 + 0), // 17 - S1
-  (-1), // 18
+  (24), // 18 - LOOP IN
   (CUP_CHIP_NR*8 + 1), // 19 - S2
-  (-1), // 20
+  (25), // 20 - LOOP OUT
   (CUP_CHIP_NR*8 + 2), // 21 - S3
-  (-1), // 22
+  (27), // 22 - LOAD
   (CUP_CHIP_NR*8 + 3), // 23 - S4
   
   (LP_CHIP_NR*8 + 8 - 1), // 24
@@ -105,32 +105,32 @@ const int buttonMap[32] = {
   6,
   7,
 
-  23,
-  24, // OFFSET UP
-  25, // OFFSET DOWNN
-  26, // SSET LOOP
-  27, // ACTIVE LOOP
-  28,
-  29,
-  30,
+  (8 + 16), // OFFSRT UP NOY MAPPED
+  (9 + 16), // OFFSET DOWN NOT MAPPED
+  (10 + 16), // SET LOOP
+  (11 + 16), // ACTIVE LOOP
+  (12 + 16), // empty ??
+  (13 + 16), // empty ??
+  (14 + 16), // empty ??
+  (15 + 16), // empty ??
 
-  (8 + 6), // CUP4
-  15, // play
-  22, // C ( NOW MAPPED TO LOAD
-  17,
-  18, // LOOP IN
-  19,
-  20, // LOOP OUT
-  31,
+  (16 + 0), // C
+  (17 + 0), // S1
+  (18 + 0), // LOOP IN
+  (19 + 0), // S2
+  (20 + 0), // LOOP OUT
+  (21 + 0), // S3
+  (22 + 0), // LOAD
+  (23 + 0), // S4
   
-  13, // random
-  16, // random
-  7,
-  (8 + 0), // CUP1
-  9, // SHIFT
-  (8 + 2), // CUP2
-  11, // SYNC
-  (8 + 4) // CUP3
+  (24 - 16), // CUE1
+  (25 - 16), // SHIFT
+  (26 - 16), // CUE2
+  (27 - 16), // SYNC
+  (28 - 16), // CUE3
+  (29 - 16), // CUE
+  (30 - 16), // CUE4
+  (31 - 16) // PLAY
 };
 // 13 CUE
 
@@ -234,7 +234,7 @@ void setup () {
     // flip bit at position
     setLedState(i, 1);
     sendLedsState();
-    delay(100);
+    delay(20);
   }
 
   clearLedsState();
@@ -418,7 +418,7 @@ void readJogPress () {
 
 void handleNoteOn(byte channel, byte note, byte velocity) {
   if (channel != channelNumber) { return; } 
-  int led = getNoteLed(buttonMap[note], velocity, true);
+  int led = getNoteLed(note, velocity, true);
   setLedState(led, 1);
   sendLedsState();
   if (debug) {
@@ -435,7 +435,7 @@ void handleNoteOn(byte channel, byte note, byte velocity) {
 
 void handleNoteOff(byte channel, byte note, byte velocity) {
   if (channel != channelNumber) { return; }
-  int led = getNoteLed(buttonMap[note], velocity, false);
+  int led = getNoteLed(note, velocity, false);
   setLedState(led, 0);
   sendLedsState();
   if (debug) {
