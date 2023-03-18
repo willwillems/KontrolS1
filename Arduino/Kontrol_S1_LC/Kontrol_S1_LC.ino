@@ -198,7 +198,8 @@ int fxPinsState[4] = {64, 64, 64, 64};
 int faderState = 0;
 
 // depends on resistor value 
-const int jogPressThresh = 525;
+const int jogPressThresh = 980;
+uint jogPressWindow = 0b00000000000000000000000000000000;
 bool jogPressState = false;
 
 void setup () {
@@ -405,13 +406,18 @@ void readFXKnobs () {
 
 void readJogPress () {
   int jogRead = analogRead(touchPin);
+  jogPressWindow = jogPressWindow << 1; // shift bit
+  bitWrite(jogPressWindow, 0, jogRead <= jogPressThresh); // write bit
 
-//  Serial.print(jogRead);
-//  Serial.print("\t");
-//  Serial.println((jogRead <= jogPressThresh) ? 100 : 0);
-  bool newJogPressState = (jogRead <= jogPressThresh);  // jog push
-  if (newJogPressState != jogPressState) {
-    jogPressState = newJogPressState;
+  Serial.print(jogRead);
+  Serial.print("\t");
+  Serial.println((jogRead <= jogPressThresh) ? 100 : 0);
+
+  if (jogPressState == HIGH && jogPressWindow == 0b00000000000000000000000000000000) {
+    jogPressState = LOW;
+    usbMIDI.sendControlChange(55, jogPressState ? 127 : 0, channelNumber);
+  } else if (jogPressState == LOW && jogPressWindow == 0b11111111111111111111111111111111){
+    jogPressState = HIGH;
     usbMIDI.sendControlChange(55, jogPressState ? 127 : 0, channelNumber);
   }
 }
