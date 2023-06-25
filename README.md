@@ -119,7 +119,7 @@ WHITE. SIGNAL (analog read: 800~900 off, 1023 on)
 -. DUMMY (unused pin on 4-pin JST connector) 
 ```
 > ## Warning
-> The jog press is not yet working so the info about it is possibly wrong. The MK1 does seem to use a IR proximity sensor but so far no reliable readings have been produced. The MK2 uses an Ambient Light Sensor with an I2C Interface called the [VNCL4000](https://cdn-shop.adafruit.com/datasheets/vcnl4000.pdf). The current MK1 problems might just be calibration issues but could also be something more serious.
+> The jog press is not yet working so the info about it is possibly wrong. The MK1 does seem to use a IR proximity sensor (probably the [HSDL-9100-024](https://docs.broadcom.com/doc/AV02-2259EN) but so far no reliable readings have been produced. The MK2 uses an Ambient Light Sensor with an I2C Interface called the [VNCL4000](https://cdn-shop.adafruit.com/datasheets/vcnl4000.pdf). The current MK1 problems might just be calibration issues but could also be something more serious.
 
 
 ## Observations
