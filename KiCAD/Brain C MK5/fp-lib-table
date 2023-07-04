@@ -1,3 +1,4 @@
 (fp_lib_table
-  (lib (name "brain")(type "KiCad")(uri "$(KIPRJMOD)/brain.pretty")(options "")(descr ""))
+  (version 7)
+  (lib (name "Audio")(type "KiCad")(uri "${KIPRJMOD}/Audio.pretty")(options "")(descr ""))
 )
